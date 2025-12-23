@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             });
                           },
                           checkColor: Colors.white,
-                          activeColor: Color.fromRGBO(255, 255, 255, 0.1),
+                          activeColor: Colors.grey[800],
                           side: const BorderSide(color: Colors.grey),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),

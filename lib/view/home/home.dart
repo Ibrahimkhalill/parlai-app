@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:parlai/view/subscribtions/upgrade_screen.dart';
 import 'package:parlai/wdiget/primaryButton.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -150,7 +151,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 label: 'Upload',
                 onTap: () {
                   if (_selectedImage != null) {
-                    debugPrint('Uploading image...');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const UpgradeScreen()),
+                    );
                   } else {
                     _pickImage();
                   }

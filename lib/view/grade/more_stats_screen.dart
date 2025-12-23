@@ -86,7 +86,7 @@ class MoreStatsScreen extends StatelessWidget {
                                   Text(
                                     'Season Avg',
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 13,
                                       color: Colors.grey[500],
                                     ),
                                   ),
@@ -115,7 +115,7 @@ class MoreStatsScreen extends StatelessWidget {
                                   Text(
                                     'Prop Line',
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 13,
                                       color: Colors.grey[500],
                                     ),
                                   ),
@@ -183,14 +183,14 @@ class MoreStatsScreen extends StatelessWidget {
                               Text(
                                 'Game 1',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 13,
                                   color: Colors.grey[600],
                                 ),
                               ),
                               Text(
                                 'Game 10',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 13,
                                   color: Colors.grey[600],
                                 ),
                               ),
@@ -234,7 +234,7 @@ class MoreStatsScreen extends StatelessWidget {
                           Text(
                             'vs This Opponent (Season)',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 14,
                               color: Colors.grey[400],
                             ),
                           ),
@@ -315,7 +315,7 @@ class MoreStatsScreen extends StatelessWidget {
                                 Text(
                                   'Injury Status',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 13,
                                     color: Colors.grey[500],
                                   ),
                                 ),
@@ -350,7 +350,7 @@ class MoreStatsScreen extends StatelessWidget {
                                 Text(
                                   'Rest',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 13,
                                     color: Colors.grey[500],
                                   ),
                                 ),
@@ -390,7 +390,7 @@ class MoreStatsScreen extends StatelessWidget {
                                 Text(
                                   'Game Tempo',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 13,
                                     color: Colors.grey[500],
                                   ),
                                 ),
@@ -425,7 +425,7 @@ class MoreStatsScreen extends StatelessWidget {
                                 Text(
                                   'Opp Defense',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 13,
                                     color: Colors.grey[500],
                                   ),
                                 ),

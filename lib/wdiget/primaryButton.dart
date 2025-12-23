@@ -41,10 +41,10 @@ Widget PrimaryButton({required String label, required VoidCallback onTap}) {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF888888), // top-left color
+                    Color.fromRGBO(98, 98, 98, 1), // top-left color
                     Colors.transparent,
-                    Color(0xFF888888), // bottom-right color
-                    Colors.transparent,
+                    Colors.transparent, // bottom-right color
+                    Color.fromARGB(255, 73, 72, 72),
                   ],
                   stops: [0.0, 0.25, 0.75, 1.0], // control gradient stops
                 ),

@@ -12,24 +12,19 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Header with back button
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 0,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(children: [GlassBackButton()]),
               ),
               const SizedBox(height: 40),
               // Profile Section
               Column(
                 children: [
-                  // Profile Image with Camera Icon
                   Stack(
                     alignment: Alignment.bottomRight,
                     children: [
@@ -74,7 +69,6 @@ class SettingsScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  // Name
                   const Text(
                     'Jenny Smith',
                     style: TextStyle(
@@ -84,7 +78,6 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Email
                   Text(
                     'jenny@gmail.com',
                     style: TextStyle(fontSize: 14, color: Colors.grey[400]),
@@ -92,44 +85,35 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 50),
-              // Settings Items
+              // Settings Cards
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
-                    // Account Information
                     GlassmorphicCard(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => AccountInformationScreen(),
-                          ),
-                        );
-                      },
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AccountInformationScreen(),
+                        ),
+                      ),
                       icon: Icons.manage_accounts_outlined,
                       title: 'Account Information',
                     ),
                     const SizedBox(height: 16),
-                    // Privacy & Policy
                     GlassmorphicCard(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => PrivacyPolicyScreen(),
-                          ),
-                        );
-                      },
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PrivacyPolicyScreen(),
+                        ),
+                      ),
                       icon: Icons.privacy_tip_outlined,
                       title: 'Privacy & Policy',
                     ),
                     const SizedBox(height: 16),
-                    // Logout
                     GlassmorphicCard(
-                      onTap: () {
-                        showLogoutModal(context); // Call this function
-                      },
+                      onTap: () => showLogoutModal(context),
                       icon: Icons.logout,
                       title: 'Logout',
                       isLogout: true,
@@ -164,56 +148,75 @@ class GlassmorphicCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.all(19),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.2),
-                width: 1.2,
+      child: IntrinsicHeight(
+        // এটা দিয়ে card auto height নিবে → সব card show হবে
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: Colors.transparent, // Very light glass tint
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.3),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  // Inner inset shadow (content ডুবে থাকবে)
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.7),
+                    blurRadius: 20,
+                    spreadRadius: -10,
+                    offset: const Offset(0, 10),
+                  ),
+                  // Top highlight (border উপরে/raised মনে হবে)
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 15,
+                    spreadRadius: 1,
+                    offset: const Offset(0, -6),
+                  ),
+                  // Bottom outer shadow for depth
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              color: Colors.transparent,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 10,
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      child: Icon(
-                        icon,
-                        color: Colors.white.withOpacity(0.9),
-                        size: 28,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(icon, color: Colors.white, size: 28),
+                      const SizedBox(width: 16),
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black.withOpacity(0.6),
+                              offset: const Offset(0, 2),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                  ],
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: Colors.white.withOpacity(0.6),
-                  size: 30,
-                ),
-              ],
+                    ],
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    color: Colors.white.withOpacity(0.7),
+                    size: 30,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

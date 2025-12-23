@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parlai/view/auth/verification.dart';
 import 'package:parlai/wdiget/customInputField.dart';
+import 'package:parlai/wdiget/glass_back_button.dart';
 import 'package:parlai/wdiget/primaryButton.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -17,11 +18,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
+              Align(alignment: Alignment.centerLeft, child: GlassBackButton()),
               const Spacer(), // ⬆ top space
 
               Column(

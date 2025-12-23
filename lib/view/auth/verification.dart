@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:parlai/view/auth/reset_password.dart';
+import 'package:parlai/wdiget/glass_back_button.dart';
 import 'dart:async';
 
 import 'package:parlai/wdiget/primaryButton.dart';
@@ -58,9 +59,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
       backgroundColor: const Color(0xFF0D0D0D),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
+              Align(alignment: Alignment.centerLeft, child: GlassBackButton()),
               const Spacer(),
 
               // Title
@@ -98,8 +100,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(4, (index) {
                   return Container(
-                    width: 60,
+                    width: 80,
                     height: 60,
+
                     margin: EdgeInsets.only(
                       left: index == 0 ? 0 : 8,
                       right: index == 3 ? 0 : 8,
@@ -112,30 +115,37 @@ class _VerificationScreenState extends State<VerificationScreen> {
                         width: 1.5,
                       ),
                     ),
-                    child: TextField(
-                      controller: _controllers[index],
-                      focusNode: _focusNodes[index],
-                      textAlign: TextAlign.center,
-                      keyboardType: TextInputType.number,
-                      maxLength: 1,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                    child: Center(
+                      child: TextField(
+                        controller: _controllers[index],
+                        focusNode: _focusNodes[index],
+
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        maxLength: 1,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        decoration: const InputDecoration(
+                          fillColor: Colors.transparent,
+                          counterText: '',
+                          border: InputBorder.none,
+                        ),
+
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        onChanged: (value) {
+                          if (value.isNotEmpty && index < 3) {
+                            _focusNodes[index + 1].requestFocus();
+                          }
+                          if (value.isEmpty && index > 0) {
+                            _focusNodes[index - 1].requestFocus();
+                          }
+                        },
                       ),
-                      decoration: const InputDecoration(
-                        counterText: '',
-                        border: InputBorder.none,
-                      ),
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      onChanged: (value) {
-                        if (value.isNotEmpty && index < 3) {
-                          _focusNodes[index + 1].requestFocus();
-                        }
-                        if (value.isEmpty && index > 0) {
-                          _focusNodes[index - 1].requestFocus();
-                        }
-                      },
                     ),
                   );
                 }),
@@ -171,7 +181,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     style: TextStyle(
                       color: _secondsRemaining > 0
                           ? const Color(0xFF8E8E8E)
-                          : const Color(0xFF6B4EFF),
+                          : const Color.fromARGB(255, 246, 245, 245),
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
