@@ -42,6 +42,7 @@ dependencies:
   gradient_borders: ^1.0.2
   glassmorphism: ^3.0.0
   liquid_glass_renderer: ^0.2.0-dev.4
+  dio: ^5.9.0
 
 dev_dependencies:
   flutter_test:

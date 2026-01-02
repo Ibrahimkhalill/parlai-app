@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:parlai/controller/auth/auth_controller.dart';
+import 'package:parlai/view/auth/login.dart';
+import 'package:parlai/wdiget/apiClient.dart';
 
 // Function to show logout modal - Call this from any screen
 void showLogoutModal(BuildContext context) {
@@ -80,7 +83,14 @@ class LogoutModal extends StatelessWidget {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        apiClient.clearSession();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
+                          (route) => false,
+                        );
                         // Add logout logic here
                         debugPrint('User logged out');
                       },

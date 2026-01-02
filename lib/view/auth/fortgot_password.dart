@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:parlai/view/auth/verification.dart';
+import 'package:parlai/controller/auth/auth_controller.dart';
+import 'package:parlai/view/auth/resetVerification.dart';
 import 'package:parlai/wdiget/customInputField.dart';
+import 'package:parlai/wdiget/getErrorMessage.dart';
 import 'package:parlai/wdiget/glass_back_button.dart';
 import 'package:parlai/wdiget/primaryButton.dart';
+// apiClient instance
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -13,19 +16,45 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController emailController = TextEditingController();
+  bool _isLoading = false;
+
+  // ✅ Forget password function
+  Future<void> sendResetCode() async {
+    final email = emailController.text.trim();
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await authController.forgotPassword(email);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResetVerificationScreen(userId: response['user_id']),
+        ),
+      );
+    } catch (e) {
+      // Handle DioException and show message
+      final errorMessage = getErrorMessage(e);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
               Align(alignment: Alignment.centerLeft, child: GlassBackButton()),
-              const Spacer(), // ⬆ top space
+              const Spacer(),
 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -48,32 +77,33 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ],
               ),
 
+              // Email Input
               CustomInputField(
                 label: "Email",
                 hintText: "write down email address",
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
               ),
 
               const SizedBox(height: 30),
 
+              // Send Code Button
               PrimaryButton(
-                label: "Send Code",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const VerificationScreen(),
-                    ),
-                  );
-                },
+                label: _isLoading ? "Sending..." : "Send Code",
+                onTap: sendResetCode,
               ),
 
-              const Spacer(), // ⬇ bottom space
+              const Spacer(),
             ],
           ),
         ),
       ),
     );
   }
-}
 
-/// Normal Input
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+}

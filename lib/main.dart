@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:parlai/view/splash/landing.dart';
+import 'package:parlai/wdiget/auth_wrapper.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,13 +14,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(
-          statusBarColor: Colors.green, // Android legacy
-          statusBarIconBrightness: Brightness.light, // Android icons
-          statusBarBrightness: Brightness.dark, // iOS icons
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
         ),
-        child: const SplashScreen(),
+        child: AuthWrapper(), // ← shudhu ei widget call
       ),
     );
   }
