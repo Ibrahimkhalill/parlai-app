@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:parlai/controller/home/home_controller.dart';
 import 'package:parlai/wdiget/glass_back_button.dart';
 
 class MoreStatsScreen extends StatelessWidget {
-  const MoreStatsScreen({Key? key}) : super(key: key);
+  final BetAnalysis betData;
+
+  const MoreStatsScreen({Key? key, required this.betData}) : super(key: key);
+
+  // Calculate season average from last 10 games
+  double _calculateSeasonAverage() {
+    if (betData.last10Graph.values.isEmpty) return 0.0;
+    final sum = betData.last10Graph.values.reduce((a, b) => a + b);
+    return sum / betData.last10Graph.values.length;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final stats = betData.advancedStats;
+    final seasonAvg = _calculateSeasonAverage();
+
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D0D),
       body: SafeArea(
@@ -24,7 +37,7 @@ class MoreStatsScreen extends StatelessWidget {
                     const Expanded(
                       child: Center(
                         child: Text(
-                          'More',
+                          'More Stats',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -38,6 +51,7 @@ class MoreStatsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
+
               // Content
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -91,9 +105,9 @@ class MoreStatsScreen extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  const Text(
-                                    '28.3',
-                                    style: TextStyle(
+                                  Text(
+                                    seasonAvg.toStringAsFixed(1),
+                                    style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -120,9 +134,9 @@ class MoreStatsScreen extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  const Text(
-                                    '27.5',
-                                    style: TextStyle(
+                                  Text(
+                                    betData.playerPoint.toStringAsFixed(1),
+                                    style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFF00D492),
@@ -136,6 +150,7 @@ class MoreStatsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
+
                     // Last 10 Games Performance
                     Row(
                       children: [
@@ -156,6 +171,7 @@ class MoreStatsScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
+
                     // Chart
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -173,7 +189,10 @@ class MoreStatsScreen extends StatelessWidget {
                             height: 180,
                             child: CustomPaint(
                               size: const Size(double.infinity, 180),
-                              painter: LineChartPainter(),
+                              painter: LineChartPainter(
+                                data: betData.last10Graph.values,
+                                trendLine: betData.last10Graph.trendLine,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 20),
@@ -181,14 +200,18 @@ class MoreStatsScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Game 1',
+                                betData.last10Graph.labels.isNotEmpty
+                                    ? betData.last10Graph.labels.first
+                                    : 'Game 1',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.grey[600],
                                 ),
                               ),
                               Text(
-                                'Game 10',
+                                betData.last10Graph.labels.isNotEmpty
+                                    ? betData.last10Graph.labels.last
+                                    : 'Game 10',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.grey[600],
@@ -197,26 +220,24 @@ class MoreStatsScreen extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: const [
-                              ScoreLabel(value: '24'),
-                              ScoreLabel(value: '31', highlighted: true),
-                              ScoreLabel(value: '27'),
-                              ScoreLabel(value: '33', highlighted: true),
-                              ScoreLabel(value: '29'),
-                              ScoreLabel(value: '26'),
-                              ScoreLabel(value: '34', highlighted: true),
-                              ScoreLabel(value: '28'),
-                              ScoreLabel(value: '32', highlighted: true),
-                              ScoreLabel(value: '30'),
-                            ],
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: betData.last10Graph.values
+                                .map(
+                                  (value) => ScoreLabel(
+                                    value: value.toString(),
+                                    highlighted: value > betData.playerPoint,
+                                  ),
+                                )
+                                .toList(),
                           ),
                           const SizedBox(height: 12),
                         ],
                       ),
                     ),
                     const SizedBox(height: 24),
+
                     // vs This Opponent
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -239,9 +260,9 @@ class MoreStatsScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          const Text(
-                            '31.5 PPG',
-                            style: TextStyle(
+                          Text(
+                            '${stats.avgVsOpponent.toStringAsFixed(1)} AVG',
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -251,6 +272,7 @@ class MoreStatsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
+
                     // Line Movement
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -285,7 +307,7 @@ class MoreStatsScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Line opened at 26.5, moved to 27.5',
+                            stats.lineMovement,
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[300],
@@ -295,6 +317,7 @@ class MoreStatsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
+
                     // Injury & Rest
                     Row(
                       children: [
@@ -320,9 +343,9 @@ class MoreStatsScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                const Text(
-                                  'Fully healthy',
-                                  style: TextStyle(
+                                Text(
+                                  stats.injuryStatus,
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white,
@@ -355,9 +378,9 @@ class MoreStatsScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                const Text(
-                                  '1 day rest',
-                                  style: TextStyle(
+                                Text(
+                                  stats.daysRest,
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white,
@@ -370,6 +393,7 @@ class MoreStatsScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 24),
+
                     // Game Tempo & Defense
                     Row(
                       children: [
@@ -395,9 +419,9 @@ class MoreStatsScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                const Text(
-                                  'Fast pace (102.3)',
-                                  style: TextStyle(
+                                Text(
+                                  stats.gameTempo,
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white,
@@ -430,9 +454,9 @@ class MoreStatsScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                const Text(
-                                  '28th',
-                                  style: TextStyle(
+                                Text(
+                                  stats.opponentDefenseRank,
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white,
@@ -476,8 +500,15 @@ class ScoreLabel extends StatelessWidget {
 }
 
 class LineChartPainter extends CustomPainter {
+  final List<int> data;
+  final double trendLine;
+
+  LineChartPainter({required this.data, required this.trendLine});
+
   @override
   void paint(Canvas canvas, Size size) {
+    if (data.isEmpty) return;
+
     final paint = Paint()
       ..color = const Color(0xFF00D492)
       ..strokeWidth = 2.5
@@ -493,18 +524,20 @@ class LineChartPainter extends CustomPainter {
       ..color = Color.fromRGBO(39, 39, 42, 0.3)
       ..style = PaintingStyle.fill;
 
-    // Data points (normalized)
-    final data = [24, 31, 27, 33, 29, 26, 34, 28, 32, 30];
-    final minVal = 24.0;
-    final maxVal = 34.0;
+    // Calculate min and max for normalization
+    final minVal = data.reduce((a, b) => a < b ? a : b).toDouble();
+    final maxVal = data.reduce((a, b) => a > b ? a : b).toDouble();
     final range = maxVal - minVal;
 
     final path = Path();
     final points = <Offset>[];
 
+    // Create points
     for (int i = 0; i < data.length; i++) {
       final x = (size.width / (data.length - 1)) * i;
-      final y = size.height - ((data[i] - minVal) / range) * (size.height - 30);
+      final y = range > 0
+          ? size.height - ((data[i] - minVal) / range) * (size.height - 30)
+          : size.height / 2;
       points.add(Offset(x, y));
     }
 
@@ -524,15 +557,19 @@ class LineChartPainter extends CustomPainter {
       canvas.drawCircle(point, 2.5, dotPaint);
     }
 
-    // Draw dashed line at bottom
+    // Draw trend line (dashed)
+    final trendY = range > 0
+        ? size.height - ((trendLine - minVal) / range) * (size.height - 30)
+        : size.height / 2;
+
     final dashPaint = Paint()
       ..color = const Color(0xFF00D492)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
     final dashPath = Path()
-      ..moveTo(0, size.height - 20)
-      ..lineTo(size.width, size.height - 20);
+      ..moveTo(0, trendY)
+      ..lineTo(size.width, trendY);
 
     _drawDashedLine(canvas, dashPath, dashPaint);
   }
@@ -555,5 +592,6 @@ class LineChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(LineChartPainter oldDelegate) => false;
+  bool shouldRepaint(LineChartPainter oldDelegate) =>
+      data != oldDelegate.data || trendLine != oldDelegate.trendLine;
 }

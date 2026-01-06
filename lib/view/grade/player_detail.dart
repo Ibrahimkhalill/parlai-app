@@ -1,16 +1,52 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:parlai/controller/home/home_controller.dart';
 import 'package:parlai/view/grade/full_analysis_screen.dart';
-
 import 'package:parlai/wdiget/glass_back_button.dart';
 import 'package:parlai/wdiget/primaryButton.dart';
 
 class PlayerDetailScreen extends StatelessWidget {
-  const PlayerDetailScreen({Key? key}) : super(key: key);
+  final BetAnalysis? betData;
+
+  const PlayerDetailScreen({Key? key, this.betData}) : super(key: key);
+
+  Color _getRiskColor(String riskLevel) {
+    if (riskLevel == "Safe") return const Color(0xFF4CAF50);
+    if (riskLevel == "Moderate") return const Color(0xFFFFC107);
+    return const Color(0xFFEF5350);
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Show error state if no data
+    if (betData == null) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF0D0D0D),
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, color: Colors.red, size: 64),
+                const SizedBox(height: 16),
+                const Text(
+                  'No player data available',
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Go Back'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final riskColor = _getRiskColor(betData!.riskLevel);
+
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D0D),
       body: SafeArea(
@@ -26,36 +62,46 @@ class PlayerDetailScreen extends StatelessWidget {
                 child: Row(children: [GlassBackButton()]),
               ),
               const SizedBox(height: 20),
-              // Hexagon with helmet icon
+
+              // Player avatar
               Container(
                 width: 160,
                 height: 160,
-                decoration: BoxDecoration(shape: BoxShape.circle),
+                decoration: const BoxDecoration(shape: BoxShape.circle),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [Image.asset('assets/images/player.png')],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 22),
+
               // Player name
-              const Text(
-                'G. LIMON',
+              Text(
+                betData!.playerName.toUpperCase(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   letterSpacing: 1,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
+
               // Stat description
               Text(
-                'Points - Higher than 22.5',
+                betData!.propDescription,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey[400]),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1,
+                ),
               ),
-              const SizedBox(height: 40),
+              // Confidence badge
+              const SizedBox(height: 30),
+
               // Analysis section
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -63,50 +109,49 @@ class PlayerDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Analysis header
-                    const Text(
-                      'ANALYSIS',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF4CAF50),
-                        letterSpacing: 1.5,
+                    Center(
+                      child: Text(
+                        'ANALYSIS',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(133, 240, 172, 1),
+                          letterSpacing: 1.5,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Analysis points
-                    AnalysisPoint(
-                      text: 'Projected to contribute as main scoring option.',
-                    ),
-                    const SizedBox(height: 16),
-                    AnalysisPoint(
-                      text: 'Averaging 24.5 PPG over the last 10 games.',
-                    ),
-                    const SizedBox(height: 16),
-                    AnalysisPoint(
-                      text: 'Facing a team with a below average defense.',
-                    ),
-                    const SizedBox(height: 16),
-                    AnalysisPoint(
-                      text:
-                          'Expected to play 35+ minutes in close-fought contest',
-                    ),
-                    const SizedBox(height: 16),
-                    AnalysisPoint(
-                      text:
-                          'Expected to play 35+ minutes in close-fought contest',
-                    ),
+
+                    // Analysis points from API
+                    if (betData!.insights.isEmpty)
+                      const Text(
+                        'No insights available',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      )
+                    else
+                      ...betData!.insights.map((insight) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: AnalysisPoint(
+                            text: insight,
+                            color: Colors.white,
+                          ),
+                        );
+                      }).toList(),
+
                     const SizedBox(height: 40),
+
                     // Full analysis button
                     SizedBox(
                       width: double.infinity,
-
                       child: PrimaryButton(
                         label: "Full analysis",
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const FullAnalysisScreen(),
+                              builder: (_) =>
+                                  FullAnalysisScreen(betData: betData!),
                             ),
                           );
                         },
@@ -126,8 +171,13 @@ class PlayerDetailScreen extends StatelessWidget {
 
 class AnalysisPoint extends StatelessWidget {
   final String text;
+  final Color color;
 
-  const AnalysisPoint({Key? key, required this.text}) : super(key: key);
+  const AnalysisPoint({
+    Key? key,
+    required this.text,
+    this.color = const Color(0xFF4CAF50),
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -139,10 +189,7 @@ class AnalysisPoint extends StatelessWidget {
           child: Container(
             width: 6,
             height: 6,
-            decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50),
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
         ),
         Expanded(

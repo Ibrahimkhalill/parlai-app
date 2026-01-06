@@ -1,25 +1,36 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:parlai/controller/home/home_controller.dart';
 import 'package:parlai/view/grade/grade.dart';
+
 import 'package:parlai/view/home/home.dart';
 import 'package:parlai/view/settings/settings_screen.dart';
 
 class MainTabs extends StatefulWidget {
-  const MainTabs({super.key});
+  final SlipAnalysisResponse? initialResult;
+  final int initialIndex;
+
+  const MainTabs({
+    super.key,
+    this.initialResult,
+    this.initialIndex = 0,
+  });
 
   @override
   State<MainTabs> createState() => _MainTabsState();
 }
 
 class _MainTabsState extends State<MainTabs> {
-  int _currentIndex = 0;
+  late int _currentIndex;
+  SlipAnalysisResponse? _lastAnalysisResult;
 
-  final List<Widget> _pages = const [
-    HomeScreen(),
-    GradeScreen(),
-    SettingsScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _lastAnalysisResult = widget.initialResult;
+  }
 
   /// Gradient
   final LinearGradient grd = const LinearGradient(
@@ -31,15 +42,97 @@ class _MainTabsState extends State<MainTabs> {
     ],
   );
 
+  void _onAnalysisComplete(SlipAnalysisResponse result) {
+    setState(() {
+      _lastAnalysisResult = result;
+      _currentIndex = 1; // Navigate to Grade screen
+    });
+  }
+
+  Widget _getCurrentPage() {
+    switch (_currentIndex) {
+      case 0:
+        return HomeScreen(onAnalysisComplete: _onAnalysisComplete);
+      case 1:
+        if (_lastAnalysisResult != null) {
+          return GradeScreen(result: _lastAnalysisResult!);
+        } else {
+          return _buildEmptyGradeScreen();
+        }
+      case 2:
+        return const SettingsScreen();
+      default:
+        return HomeScreen(onAnalysisComplete: _onAnalysisComplete);
+    }
+  }
+
+  Widget _buildEmptyGradeScreen() {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/images/logo.png', width: 80, height: 80),
+              const SizedBox(height: 30),
+              const Text(
+                'No Analysis Yet',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40),
+                child: Text(
+                  'Upload a betting slip from the Home tab to see your performance score',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFF8E8E8E),
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() => _currentIndex = 0);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Go to Home',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-
-      /// BODY (no SafeArea here)
-      body: IndexedStack(index: _currentIndex, children: _pages),
-
-      /// BOTTOM NAV (SafeArea applied here)
+      body: _getCurrentPage(),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -107,9 +200,6 @@ class _MainTabsState extends State<MainTabs> {
     );
   }
 
-  /// ============================
-  /// Bottom Nav Item
-  /// ============================
   Widget _buildNavItem({
     required IconData icon,
     required String label,

@@ -5,6 +5,7 @@ import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 Widget PrimaryButton({required String label, required VoidCallback onTap}) {
   return GestureDetector(
     onTap: onTap,
+
     child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
@@ -32,7 +33,7 @@ Widget PrimaryButton({required String label, required VoidCallback onTap}) {
             margin: const EdgeInsets.all(1.2),
 
             decoration: BoxDecoration(
-              color: const Color.fromRGBO(255, 255, 255, .1),
+              color: const Color.fromARGB(26, 227, 227, 227),
 
               /// INNER BORDER + GLOW
               borderRadius: BorderRadius.circular(24),
@@ -41,10 +42,10 @@ Widget PrimaryButton({required String label, required VoidCallback onTap}) {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color.fromRGBO(98, 98, 98, 1), // top-left color
+                    Color.fromRGBO(59, 59, 59, 1), // top-left color
                     Colors.transparent,
                     Colors.transparent, // bottom-right color
-                    Color.fromARGB(255, 73, 72, 72),
+                    Color.fromARGB(255, 49, 49, 49),
                   ],
                   stops: [0.0, 0.25, 0.75, 1.0], // control gradient stops
                 ),

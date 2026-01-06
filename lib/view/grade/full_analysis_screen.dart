@@ -1,13 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:parlai/controller/home/home_controller.dart';
 import 'package:parlai/view/grade/more_stats_screen.dart';
 import 'package:parlai/wdiget/glass_back_button.dart';
 import 'package:parlai/wdiget/primaryButton.dart';
 
 class FullAnalysisScreen extends StatelessWidget {
-  const FullAnalysisScreen({Key? key}) : super(key: key);
+  final BetAnalysis betData;
+
+  const FullAnalysisScreen({Key? key, required this.betData}) : super(key: key);
+
+  Color _getRiskColor(String riskLevel) {
+    if (riskLevel == "Safe") return const Color(0xFF4CAF50);
+    if (riskLevel == "Moderate") return const Color(0xFFFFC107);
+    return const Color(0xFFEF5350);
+  }
+
+  Color _getMatchupColor(String difficulty) {
+    if (difficulty == "Great" || difficulty == "Easy") {
+      return const Color(0xFF4CAF50);
+    }
+    if (difficulty == "Moderate" || difficulty == "Good") {
+      return const Color(0xFFFFC107);
+    }
+    return const Color(0xFFEF5350);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final stats = betData.advancedStats;
+    final riskColor = _getRiskColor(betData.riskLevel);
+
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D0D),
       body: SafeArea(
@@ -22,7 +44,6 @@ class FullAnalysisScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       GlassBackButton(),
-
                       const Expanded(
                         child: Center(
                           child: Text(
@@ -39,6 +60,7 @@ class FullAnalysisScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
+
                 // Main Analysis Card
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -57,9 +79,9 @@ class FullAnalysisScreen extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'J. Carson',
-                                style: TextStyle(
+                              Text(
+                                betData.playerName,
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -67,7 +89,7 @@ class FullAnalysisScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'PTS over 22.5',
+                                betData.propDescription,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.grey[400],
@@ -75,69 +97,110 @@ class FullAnalysisScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          Icon(
-                            Icons.trending_up,
-                            color: const Color(0xFF4CAF50),
-                            size: 20,
-                          ),
+                          Icon(Icons.trending_up, color: riskColor, size: 20),
                         ],
                       ),
                       const SizedBox(height: 16),
+
                       // Progress bar
                       ClipRRect(
                         borderRadius: BorderRadius.circular(4),
                         child: SizedBox(
                           height: 8,
                           child: LinearProgressIndicator(
-                            value: 0.9,
+                            value: betData.confidenceScore / 100,
                             backgroundColor: Colors.grey[800],
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xFF4CAF50),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              riskColor,
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 28),
-                      // Analysis items
+
+                      // Analysis items from API
                       AnalysisItem(
                         icon: Icons.schedule,
-                        title:
-                            'Expected to play 35+ minutes in close-fought contest',
+                        title: 'Expected minutes: ${stats.expectedMinutes}',
                       ),
                       const SizedBox(height: 16),
+
                       AnalysisItem(
                         icon: Icons.bar_chart,
-                        title: 'Avg PTS vs opponent: 23.8 (line 22.5)',
+                        title:
+                            'Avg vs opponent: ${stats.avgVsOpponent} (line ${betData.playerPoint})',
                       ),
                       const SizedBox(height: 16),
+
                       AnalysisItem(
                         icon: Icons.trending_up,
-                        title: 'Usage up 15% over last 5 games',
+                        title: stats.usageRateChange,
                       ),
                       const SizedBox(height: 16),
+
                       AnalysisItem(
                         icon: Icons.shield,
                         title: 'Matchup difficulty: ',
-                        highlightText: 'Moderate',
-                        highlightColor: const Color(0xFF4CAF50),
+                        highlightText: stats.matchupDifficulty,
+                        highlightColor: _getMatchupColor(
+                          stats.matchupDifficulty,
+                        ),
                       ),
                       const SizedBox(height: 16),
+
                       AnalysisItem(
                         icon: Icons.location_on,
-                        title: 'Home / Away split: +2.1 PTS',
+                        title: 'Home / Away split: ${stats.homeAwaySplit}',
                       ),
+                      const SizedBox(height: 16),
+
+                      AnalysisItem(
+                        icon: Icons.healing,
+                        title: 'Injury status: ',
+                        highlightText: stats.injuryStatus,
+                        highlightColor: stats.injuryStatus == "Fully healthy"
+                            ? const Color(0xFF4CAF50)
+                            : const Color(0xFFEF5350),
+                      ),
+                      const SizedBox(height: 16),
+
+                      AnalysisItem(
+                        icon: Icons.calendar_today,
+                        title: 'Days rest: ${stats.daysRest}',
+                      ),
+                      const SizedBox(height: 16),
+
+                      AnalysisItem(
+                        icon: Icons.speed,
+                        title: 'Game tempo: ${stats.gameTempo}',
+                      ),
+                      const SizedBox(height: 16),
+
+                      AnalysisItem(
+                        icon: Icons.sports,
+                        title:
+                            'Opponent defense rank: ${stats.opponentDefenseRank}',
+                      ),
+                      const SizedBox(height: 16),
+
+                      AnalysisItem(
+                        icon: Icons.show_chart,
+                        title: stats.lineMovement,
+                      ),
+
                       const SizedBox(height: 32),
+
                       // View even more stats button
                       SizedBox(
                         width: double.infinity,
-
                         child: PrimaryButton(
                           label: "View Even More Stats",
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const MoreStatsScreen(),
+                                builder: (_) =>
+                                    MoreStatsScreen(betData: betData),
                               ),
                             );
                           },

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:parlai/controller/home/home_controller.dart';
 import 'package:parlai/view/grade/player_detail.dart';
 
 class PlayerStatCard extends StatelessWidget {
@@ -7,6 +8,9 @@ class PlayerStatCard extends StatelessWidget {
   final String stat;
   final double progress;
   final Color color;
+  final String? riskLevel;
+  final int? confidenceScore;
+  final BetAnalysis? betData;
 
   const PlayerStatCard({
     Key? key,
@@ -14,6 +18,9 @@ class PlayerStatCard extends StatelessWidget {
     required this.stat,
     required this.progress,
     required this.color,
+    this.riskLevel,
+    this.confidenceScore,
+    this.betData,
   }) : super(key: key);
 
   @override
@@ -21,17 +28,17 @@ class PlayerStatCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => PlayerDetailScreen()),
+        MaterialPageRoute(builder: (_) => PlayerDetailScreen(betData: betData)),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(15), // Premium rounded look
+        borderRadius: BorderRadius.circular(15),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: Colors.black.withOpacity(0.35), // Base glass tint
+              color: Colors.black.withOpacity(0.35),
               border: Border.all(
                 color: Colors.white.withOpacity(0.3),
                 width: 1.2,
@@ -45,21 +52,18 @@ class PlayerStatCard extends StatelessWidget {
                 ],
               ),
               boxShadow: [
-                // Inner dark shadow → content ডুবে থাকবে (inset feel)
                 BoxShadow(
                   color: Colors.black.withOpacity(0.7),
                   blurRadius: 20,
-                  spreadRadius: -8, // Negative for inner effect
+                  spreadRadius: -8,
                   offset: const Offset(0, 8),
                 ),
-                // Top light highlight → border উপরে/raised মনে হবে
                 BoxShadow(
                   color: Colors.black.withOpacity(0.2),
                   blurRadius: 20,
                   spreadRadius: 2,
                   offset: const Offset(0, -6),
                 ),
-                // Bottom outer shadow for depth
                 BoxShadow(
                   color: Colors.black.withOpacity(0.5),
                   blurRadius: 20,
