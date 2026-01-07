@@ -127,7 +127,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 40),
 
                   PrimaryButton(
-                    label: _isLoading ? "Signing Up..." : "Sign Up",
+                    label: "Sign Up",
+                    isLoading: _isLoading,
                     onTap: _handleSignUp,
                   ),
 

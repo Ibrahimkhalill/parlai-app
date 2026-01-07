@@ -180,6 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Log In Button - Correct way
                   PrimaryButton(
                     label: "Log In",
+                    isLoading: _isLoading,
                     onTap: () {
                       _login();
                     },
